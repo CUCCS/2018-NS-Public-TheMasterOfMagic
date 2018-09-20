@@ -22,11 +22,15 @@
 - 到此，经测试，发现Victim与Gateway的两块网卡可以相互ping通，Attacker与Gateway的外网网卡可以相互ping通，但Victim与Attacker不能相互ping通
 
 ## 二. 配置转发
-- 在Victim ping Attacker的同时分别监听Gateway的两块网卡与Attacker的网卡，可以发现来自Victim的echo request包经过Gateway到达了Attacker，且Attacker也回复了echo reply包。但由于echo request包中的源地址为192.168.68.2，故Attacker的echo reply包并没有正确的发给Gateway，从而导致Victim ping不通Attacker
+- 尝试使Victim ping Attacker，发现总是超时
 	- ![](images/vpa-v-f.png)
-	- ![](images/vpa-g-f.png)
+- 监听一下Gateway的两块网卡，发现Gateway并没有把在内网网卡(enp0s3)上接收到的`echo request`从外网网卡(enp0s8)送出去
+	- ![](images/no-request-on-enp0s3.png)
+- 原因是因为没有开启Gateway的操作系统的ipv4转发功能。在Gateway上执行`echo 1 > /proc/sys/net/ipv4/ip_forward`以开启该功能，稍后再次尝试，可以看到Gateway已经把在内网网卡上接收到的echo request从外网网卡送出去了
+	- ![](images/request-on-enp0s3.png)
+- 不过此时Victim上仍然显示`请求超时`。从上面的结果我们也能看到Gateway没有收到来自Attacker的echo reply。进一步监听Attacker的网卡，发现Attacker回复了`echo reply`，只不过目标地址是`192.168.68.2`这么个内网地址，而Attacker所在的网络里是没有这个ip的（就算有也不是我们的Victim）
 	- ![](images/vpa-a-f.png)
-- 为了使`echo reply`包能正确经由Gateway返回到Victim，需在Gateway中使用`iptables`配置转发规则并保存
+- 为了使`echo reply`包能正确经由Gateway返回到Victim，需在Gateway中使用`iptables`配置防火墙并保存配置
 	- ![](images/iptables.png)
 - 然后再使Victim ping Attacker，发现可以ping通了。通过监听网卡可以发现，`echo request`包在经由Gateway转发时，源ip已经由Victim的`192.168.68.2`变成了Gateway的`10.0.2.4`。而Attacker回复的`echo reply`包在经由Gateway转发时，目标ip也从Gateway的`10.0.2.4`变回成了Victim的`192.168.68.2`，从而实现了Victim ping通Attacker
 	- ![](images/vpa-v-s.png)
