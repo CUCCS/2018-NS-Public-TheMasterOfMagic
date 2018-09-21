@@ -59,6 +59,23 @@
 		- ![](images/ubuntu-etc-netplan-01.png)
 	- 随后以`root`身份执行`netplan apply`，短暂的等待后，便能在`ifconfig`中看到第二块网卡了
 2. Gateway重启后之前配置的转发失效的问题（已解决）
-	- 不知道为什么每次重启后`iptables-save`的输出就是空了。需要每次重启后或手动或写入`.bashrc`中再执行一遍前文配置转发规则的命令才能使Victim正确ping通Attacker
+	- 默认情况下，Gateway在重启后会清空`iptables`的设置。此时可以分别在以下两个文件中写入以下内容以自动保存/加载配置好的规则（在`Ubuntu Server 18.04`需执行`apt install ifupdown`）:
+
+		```bash
+		$ cat /etc/network/if-pre-up.d/firewall
+		#!/bin/sh
+		/sbin/iptables-restore < /etc/iptables.rules
+		$ cat /etc/network/if-post-down.d/firewall
+		#!/bin/sh
+		/sbin/iptables-save -c > /etc/iptables.rules
+		```
+		注意不同平台上`iptables-restore`与`iptables-save`的位置可能不一样。其位置可以通过`which`指令来确定：
+
+		```bash
+		$ which iptables-restore
+		/sbin/iptables-restore
+		$ which iptables-save
+		/sbin/iptables-save
+		```
 3. Victim的DNS服务器问题（未解决）
 	- 如前文所述，我最后使用了阿里云的公共DNS服务器才使Victim能够查询域名了。然而我本意是希望Victim将查询域名的请求发给Gateway，由Gateway完成域名解析的工作并返回结果。通过`cat /etc/resolv.conf`我认为Gateway的本地DNS服务器为127.0.0.53，所以我希望将且只将来自Victim的发往本地53端口的请求转发给127.0.0.53。网上的方法基本都是用`iptables`，但具体命令都不太一样**而且还没有一个能使的**。不得已我只能使用公共DNS服务器
