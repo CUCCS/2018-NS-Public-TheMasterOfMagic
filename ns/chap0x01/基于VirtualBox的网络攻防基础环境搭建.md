@@ -21,7 +21,7 @@
 	- ![](images/request-on-enp0s3.png)
 - 不过此时Victim上仍然显示`请求超时`。从上面的结果我们也能看到Gateway没有收到来自Attacker的echo reply。进一步监听Attacker的网卡，发现Attacker回复了`echo reply`，只不过目标地址是`192.168.68.2`这么个内网地址，而Attacker所在的网络里是没有这个ip的（就算有也不是我们的Victim）
 	- ![](images/vpa-a-f.png)
-- 为了使`echo reply`包能正确经由Gateway返回到Victim，需在Gateway中使用`iptables`配置防火墙并保存配置
+- 为了使`echo reply`包能正确经由Gateway返回到Victim，需在Gateway中执行`iptables -t nat -A POSTROUTING -s 192.168.68.0/24 -o enp0s3 -j MASQUERADE`来配置防火墙并保存配置
 	- ![](images/iptables.png)
 - 然后再使Victim ping Attacker，发现可以ping通了。通过监听网卡可以发现，`echo request`包在经由Gateway转发时，源ip已经由Victim的`192.168.68.2`变成了Gateway的`10.0.2.4`。而Attacker回复的`echo reply`包在经由Gateway转发时，目标ip也从Gateway的`10.0.2.4`变回成了Victim的`192.168.68.2`，从而实现了Victim ping通Attacker
 	- ![](images/vpa-v-s.png)
