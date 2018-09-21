@@ -14,8 +14,8 @@
 - 梳理完之后，我们再来回答问题
 
 ### 查看统计当前信号覆盖范围内一共有多少独立的SSID？其中是否包括隐藏SSID？
-- 独立SSID，要么能通过AP广播Beacon帧被我们识别，要么通过回复Probe Response被我们识别。而其中①不广播Beacon只回复Probe Response或②广播Beacon但SSID为空的，可以被认为是隐藏SSID
-- 首先获取所有广播了Beacon的AP的SSID:![](images/1.png)可以看到，有一个AP在广播的Beacon帧中放入的是空SSID
+- 独立SSID，要么能通过AP广播Beacon帧被我们识别，要么通过回复Probe Response被我们识别。而其中①不广播Beacon只回复Probe Response或②广播Beacon但SSID为空（或者由若干`\x00`组成）的，可以被认为是隐藏SSID
+- 首先获取所有广播了Beacon的AP的SSID（命令中`cat -v`是为了用可打印字符来表示不可打印字符，进而将不可打印字符与空进行区分）:![](images/1.png)可以看到，有一个AP在广播的Beacon帧中放入的是空SSID
 - 接下来再来获取所有回复了Probe Response的AP的SSID:![](images/2.png)可以看到，第一张截图中的隐藏SSID其实是`<length:  13>`
 - 回答问题：当前信号覆盖范围内一共有3个独立SSID，其中包括一个隐藏SSID
 
