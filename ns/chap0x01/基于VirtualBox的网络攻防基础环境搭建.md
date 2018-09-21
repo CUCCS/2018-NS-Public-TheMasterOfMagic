@@ -8,17 +8,8 @@
 	- Gateway与Attacker在安装完毕后都以`root`身份执行了`apt update && apt upgrade -y && apt dist-upgrade -y`）
 	- Victim与Attacker在安装完毕后都安装了增强功能（其中Attacker的增强功能是使用`apt install virtualbox-guest-x11`安装的）
 	- Victim在安装完毕后关闭了防火墙
-- 随后，为三个节点配置网卡如下：
-	- Victim:
-		- 只有一块Internal Network网卡 
-		- ![](images/victim-ipconfig.png)
-	- Gateway: 
-		- 有一块Internal Network网卡（enp0s8）与一块Nat Network网卡（enp0s3）
-		- ![](images/gateway-ifconfig.png)
-	- Attacker:
-		- 只有一块Nat Network网卡
-		- ![](images/attacker-ifconfig.png)
-	- 上述四块网卡中两块Internal Network网卡处于同一子网中，两块Nat Network网卡处于同一Nat Network中
+- 随后，如图配置拓扑结构：
+	- ![](images/topology.png)
 - 到此，经测试，发现Victim与Gateway的两块网卡可以相互ping通，Attacker与Gateway的外网网卡可以相互ping通，但Victim与Attacker不能相互ping通
 
 ## 二. 配置转发
