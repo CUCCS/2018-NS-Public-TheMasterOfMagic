@@ -36,7 +36,7 @@
 	- ![](images/g-ping-v.png)
 	- ![](images/g-ping-a.png)
 - 所有主机均能访问互联网
-	- 目前Victim没有配置DNS服务器，所以无法通过域名进行访问。这里使用阿里云的公共DNS服务器`223.6.6.6`与`223.5.5.5`作为其DNS服务器（这里有个问题，下面有说）
+	- 目前Victim没有配置DNS服务器，所以无法通过域名进行访问。这里在网关上执行`apt install dnsmasq`并在Victim上配置DNS服务器为Gateway
 		- ![](images/victim-ipconfig-all.png)
 	- 随后，各个主机都能通过域名访问外部网站了
 		- ![](images/victim-ping-bing.png)
@@ -77,5 +77,4 @@
 		$ which iptables-save
 		/sbin/iptables-save
 		```
-3. Victim的DNS服务器问题（未解决）
-	- 如前文所述，我最后使用了阿里云的公共DNS服务器才使Victim能够查询域名了。然而我本意是希望Victim将查询域名的请求发给Gateway，由Gateway完成域名解析的工作并返回结果。通过`cat /etc/resolv.conf`我认为Gateway的本地DNS服务器为127.0.0.53，所以我希望将且只将来自Victim的发往本地53端口的请求转发给127.0.0.53。网上的方法基本都是用`iptables`，但具体命令都不太一样**而且还没有一个能使的**。不得已我只能使用公共DNS服务器
+3. Victim的DNS服务器问题（已解决并更新到前文中）
